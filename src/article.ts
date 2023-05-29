@@ -8,7 +8,7 @@ mongoose.connect(url).then(() => {
   console.log('Connected to MongoDB');
 });
 
-import { BodyRequest, ParamsRequest } from './types/RequestResponse';
+import { BodyParamsRequest, BodyRequest, ParamsRequest } from './types/RequestResponse';
 
 type ArticleType = {
   title: string;
@@ -36,6 +36,9 @@ router.use(
   }),
 );
 
+/**
+ * ALL ARTICLES REQUESTS
+ */
 router
   .route('/')
   .get((req, res) => {
@@ -72,16 +75,50 @@ router
       });
   });
 
-router.delete('/:id', (req: ParamsRequest<{ id: string }>, res) => {
-  const { id } = req.params;
-  console.log(id);
-  Article.findByIdAndRemove(id)
-    .then(() => {
-      res.send('Successfully deleted article');
-    })
-    .catch((err) => {
-      res.send(err);
-    });
-});
+/**
+ * SINGLE ARTICLE REQUESTS
+ */
+router
+  .route('/:id')
+  .get((req: ParamsRequest<{ id: string }>, res) => {
+    const { id } = req.params;
+    Article.findById(id)
+      .then((article) => {
+        res.send(article);
+      })
+      .catch((err) => {
+        res.send(err);
+      });
+  })
+  .put((req: BodyParamsRequest<{ id: string }, ArticleType>, res) => {
+    const { id } = req.params;
+    Article.findByIdAndUpdate(id, req.body, { overwrite: true })
+      .then((updatedArticle) => {
+        res.send(updatedArticle);
+      })
+      .catch((err) => {
+        res.send(err);
+      });
+  })
+  .patch((req: BodyParamsRequest<{ id: string }, ArticleType>, res) => {
+    const { id } = req.params;
+
+    Article.findByIdAndUpdate(id, req.body, { overwrite: true })
+      .then((updatedArticle) => {
+        res.send(updatedArticle);
+      })
+      .catch((err) => res.send(err));
+  })
+  .delete((req: ParamsRequest<{ id: string }>, res) => {
+    const { id } = req.params;
+    console.log(id);
+    Article.findByIdAndDelete(id)
+      .then(() => {
+        res.send('Successfully deleted article');
+      })
+      .catch((err) => {
+        res.send(err);
+      });
+  });
 
 export default router;
