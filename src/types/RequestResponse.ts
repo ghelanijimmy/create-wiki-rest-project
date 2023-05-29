@@ -8,3 +8,8 @@ export interface BodyRequest<T> extends Request {
 export interface ParamsRequest<T extends ParamsDictionary> extends Request {
   params: T;
 }
+
+export interface BodyParamsRequest<T extends ParamsDictionary, U> extends Request {
+  params: T;
+  body: U;
+}
